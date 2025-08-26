@@ -1,0 +1,13 @@
+Hiring managers and builders in retail/warehouse ops:
+
+I built Warehouse AI Suite (v1) — a production-grade FastAPI + Postgres backend for inventory intelligence.
+- Real domain tables and migrations
+- Low-stock alerts out-of-the-box
+- One-command launch with Docker
+- Postman collection + seed data
+- CI and clean architecture
+
+Repo includes an implementation you can run in minutes and extend to dashboards and optimization.
+I am exploring roles where I can ship systems like this at pace.
+
+Demo script and README guide inside the repo.
