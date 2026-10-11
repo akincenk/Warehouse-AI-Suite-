@@ -42,3 +42,14 @@ def test_deleting_sku_cascades_to_inventory_and_pos(client, sku):
     assert client.delete(f"/api/v1/skus/{sku['id']}").status_code == 204
     assert client.get("/api/v1/inventory").json() == []
     assert client.get("/api/v1/purchase-orders").json() == []
+
+
+def test_duplicate_insert_race_returns_409(client, sku, monkeypatch):
+    # Simulate a concurrent insert: the pre-check sees nothing, the unique constraint fires on commit.
+    from sqlalchemy.orm import Query
+
+    monkeypatch.setattr(Query, "first", lambda self: None)
+    r = client.post("/api/v1/skus", json={"code": sku["code"], "name": "Other"})
+    assert r.status_code == 409
+    monkeypatch.undo()
+    assert len(client.get("/api/v1/skus").json()) == 1

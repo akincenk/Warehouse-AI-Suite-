@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
@@ -18,7 +19,11 @@ def create_sku(payload: SKUCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=409, detail="SKU code already exists")
     sku = SKU(code=payload.code, name=payload.name, category=payload.category)
     db.add(sku)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:  # concurrent insert won the unique-constraint race
+        db.rollback()
+        raise HTTPException(status_code=409, detail="SKU code already exists") from None
     db.refresh(sku)
     return sku
 

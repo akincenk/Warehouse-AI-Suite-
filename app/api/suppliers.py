@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
@@ -18,7 +19,11 @@ def create_supplier(payload: SupplierCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=409, detail="Supplier already exists")
     s = Supplier(name=payload.name, lead_time_days=payload.lead_time_days)
     db.add(s)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:  # concurrent insert won the unique-constraint race
+        db.rollback()
+        raise HTTPException(status_code=409, detail="Supplier already exists") from None
     db.refresh(s)
     return s
 
@@ -36,7 +41,11 @@ def update_supplier(supplier_id: int, payload: SupplierUpdate, db: Session = Dep
             raise HTTPException(status_code=409, detail="Supplier already exists")
     for k, v in data.items():
         setattr(s, k, v)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:  # concurrent insert won the unique-constraint race
+        db.rollback()
+        raise HTTPException(status_code=409, detail="Supplier already exists") from None
     db.refresh(s)
     return s
 

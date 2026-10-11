@@ -36,3 +36,14 @@ def test_deleting_supplier_unlinks_inventory(client, sku, supplier):
     assert client.delete(f"/api/v1/suppliers/{supplier['id']}").status_code == 204
     rows = client.get("/api/v1/inventory").json()
     assert [(r["id"], r["supplier_id"]) for r in rows] == [(inv["id"], None)]
+
+
+def test_duplicate_insert_and_rename_race_return_409(client, supplier, monkeypatch):
+    from sqlalchemy.orm import Query
+
+    other = client.post("/api/v1/suppliers", json={"name": "Globex"}).json()
+    monkeypatch.setattr(Query, "first", lambda self: None)  # pre-checks miss, as under a race
+    assert client.post("/api/v1/suppliers", json={"name": "Acme"}).status_code == 409
+    assert client.put(f"/api/v1/suppliers/{other['id']}", json={"name": "Acme"}).status_code == 409
+    monkeypatch.undo()
+    assert sorted(s["name"] for s in client.get("/api/v1/suppliers").json()) == ["Acme", "Globex"]
