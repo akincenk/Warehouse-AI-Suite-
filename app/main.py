@@ -1,9 +1,10 @@
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
+
 from app.api import api_router
 
 app = FastAPI(
-    title="Warehouse AI Suite API",
+    title="Warehouse AI Suite - Inventory API",
     version="1.0.0",
     openapi_tags=[
         {"name": "util", "description": "Utility endpoints"},

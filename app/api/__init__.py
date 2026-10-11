@@ -1,5 +1,6 @@
 from fastapi import APIRouter
-from . import skus, suppliers, inventory, purchase_orders, util
+
+from . import inventory, purchase_orders, skus, suppliers, util
 
 api_router = APIRouter(prefix="/api/v1")
 api_router.include_router(util.router, tags=["util"])

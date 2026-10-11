@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+
 from app.db.session import get_db
 from app.models.sku import SKU
-from app.schemas.sku import SKUCreate, SKUUpdate, SKUOut
+from app.schemas.sku import SKUCreate, SKUOut, SKUUpdate
 
 router = APIRouter()
 
@@ -16,7 +17,9 @@ def create_sku(payload: SKUCreate, db: Session = Depends(get_db)):
     if exists:
         raise HTTPException(status_code=409, detail="SKU code already exists")
     sku = SKU(code=payload.code, name=payload.name, category=payload.category)
-    db.add(sku); db.commit(); db.refresh(sku)
+    db.add(sku)
+    db.commit()
+    db.refresh(sku)
     return sku
 
 @router.get("/{sku_id}", response_model=SKUOut)
@@ -31,9 +34,13 @@ def update_sku(sku_id: int, payload: SKUUpdate, db: Session = Depends(get_db)):
     sku = db.get(SKU, sku_id)
     if not sku:
         raise HTTPException(status_code=404, detail="SKU not found")
-    for k, v in payload.model_dump(exclude_unset=True).items():
+    data = payload.model_dump(exclude_unset=True)
+    if "name" in data and data["name"] is None:
+        raise HTTPException(status_code=400, detail="name cannot be null")
+    for k, v in data.items():
         setattr(sku, k, v)
-    db.commit(); db.refresh(sku)
+    db.commit()
+    db.refresh(sku)
     return sku
 
 @router.delete("/{sku_id}", status_code=204)
@@ -41,5 +48,6 @@ def delete_sku(sku_id: int, db: Session = Depends(get_db)):
     sku = db.get(SKU, sku_id)
     if not sku:
         raise HTTPException(status_code=404, detail="SKU not found")
-    db.delete(sku); db.commit()
+    db.delete(sku)
+    db.commit()
     return None
