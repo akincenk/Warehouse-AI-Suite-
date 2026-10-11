@@ -2,6 +2,7 @@ import os
 
 # Tests run against DATABASE_URL (PostgreSQL in CI). Without it, fall back to a local SQLite file.
 os.environ.setdefault("DATABASE_URL", "sqlite:///./test.db")
+os.environ["API_KEY"] = "test-key"
 
 import pytest  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402
@@ -30,7 +31,7 @@ def _clean_tables():
 
 @pytest.fixture
 def client():
-    with TestClient(app) as c:
+    with TestClient(app, headers={"X-API-Key": "test-key"}) as c:
         yield c
 
 
