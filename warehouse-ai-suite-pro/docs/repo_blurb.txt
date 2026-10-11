@@ -1,2 +1,0 @@
-Warehouse AI Suite (v1) - Production-grade FastAPI backend for inventory intelligence.
-Includes CRUD, low-stock alerts, Alembic migrations, seed data, CI, Makefile, Postman collection, and Docker Compose.
