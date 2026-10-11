@@ -38,6 +38,8 @@ jobs:
           cache: pip
       - run: pip install -e ".[dev]"
       - run: ruff check .
+      - name: Audit dependencies for known vulnerabilities
+        run: pip-audit --skip-editable
       - name: Apply migrations and check they match the models
         run: |
           alembic upgrade head
