@@ -1,11 +1,11 @@
 # Warehouse Inventory API
 
-[![CI](https://github.com/akincenk/warehouse-inventory-api/actions/workflows/ci.yml/badge.svg)](https://github.com/akincenk/warehouse-inventory-api/actions/workflows/ci.yml)
+[![CI](https://github.com/akincenk/Warehouse-inventory-api/actions/workflows/ci.yml/badge.svg)](https://github.com/akincenk/Warehouse-inventory-api/actions/workflows/ci.yml)
 
 A REST backend for warehouse inventory: SKUs, suppliers, stock levels, purchase orders and low-stock alerts.
 
-There is no AI or machine learning in this repository. It is the inventory data layer that forecasting or
-replenishment models could sit on top of (see *Limitations and next steps*).
+It is meant for small warehouses and shops that keep stock counts and reorders in spreadsheets and want a simple,
+self-hosted API for that data instead. Planned work is in [ROADMAP.md](ROADMAP.md) and the issue tracker.
 
 ## What it does
 
@@ -48,7 +48,7 @@ erDiagram
 ### Docker Compose
 
 ```bash
-git clone https://github.com/akincenk/warehouse-inventory-api.git && cd warehouse-inventory-api
+git clone https://github.com/akincenk/Warehouse-inventory-api.git && cd Warehouse-inventory-api
 cp .env.example .env               # then set API_KEY (and real Postgres credentials) in .env
 docker compose up -d --build      # starts Postgres, applies migrations, serves the API on :8000
 curl http://localhost:8000/health
@@ -140,8 +140,8 @@ dependencies with `pip-audit`, and builds the Docker image. Dependabot proposes 
 - No pagination or filtering on list endpoints.
 - Purchase orders do not change stock levels when received, and status transitions are not enforced.
 - Low-stock alerts are a pull endpoint; there is no notification channel.
-- Possible next steps, including the "AI" the name points at: demand forecasting per SKU, reorder-quantity
-  suggestions from supplier lead times, and a small dashboard.
+
+Fixing these is the plan; see [ROADMAP.md](ROADMAP.md).
 
 ## License
 
